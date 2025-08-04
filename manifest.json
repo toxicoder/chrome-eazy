@@ -3,7 +3,7 @@
   "name": "Side Panel Extension",
   "version": "1.0",
   "description": "A simple extension to demonstrate the Side Panel API.",
-  "permissions": ["sidePanel"],
+  "permissions": ["sidePanel", "tabGroups", "tabs", "storage"],
   "action": {
     "default_title": "Open side panel"
   },
