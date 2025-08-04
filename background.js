@@ -65,14 +65,49 @@ async function showTabs(tabIds) {
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'hideTabs') {
-    hideTabs(request.tabIds);
-  } else if (request.action === 'showTabs') {
-    showTabs(request.tabIds);
+  if (request.action === 'workspaceActivated') {
+    handleWorkspaceActivation(request.workspaceId);
   }
   // To indicate that we will respond asynchronously.
   return true;
 });
+
+async function handleWorkspaceActivation(activeWorkspaceId) {
+    const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
+    const allTabs = await chrome.tabs.query({});
+    const allTabIds = new Set(allTabs.map(t => t.id));
+
+    let workspacesNeedUpdate = false;
+    const tabsToShow = [];
+    const tabsToHide = [];
+
+    for (const workspace of workspaces) {
+        // Clean up tabs that no longer exist
+        const originalTabCount = workspace.tabs.length;
+        workspace.tabs = workspace.tabs.filter(tabId => allTabIds.has(tabId));
+        if (workspace.tabs.length !== originalTabCount) {
+            workspacesNeedUpdate = true;
+        }
+
+        const workspaceTabs = Array.isArray(workspace.tabs) ? workspace.tabs : [];
+        if (workspace.id === activeWorkspaceId) {
+            tabsToShow.push(...workspaceTabs);
+        } else {
+            tabsToHide.push(...workspaceTabs);
+        }
+    }
+
+    if (workspacesNeedUpdate) {
+        await chrome.storage.local.set({ workspaces });
+    }
+
+    // Hide inactive tabs first to avoid visual flickering
+    await hideTabs(tabsToHide);
+    await showTabs(tabsToShow);
+
+    // Refresh the sidebar to show the correct state
+    chrome.runtime.sendMessage({ action: "refresh" });
+}
 
 const ACTIVE_WORKSPACE_ID_KEY = 'activeWorkspaceId';
 

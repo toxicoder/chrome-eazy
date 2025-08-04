@@ -1,70 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
 body {
-    font-family: sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
+    width: 320px; /* A bit wider for better spacing */
+    background-color: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
+}
+
+body.dark {
+    --md-sys-color-primary: #D0BCFF;
+    --md-sys-color-on-primary: #381E72;
+    --md-sys-color-primary-container: #4F378B;
+    --md-sys-color-on-primary-container: #EADDFF;
+    --md-sys-color-secondary: #CCC2DC;
+    --md-sys-color-on-secondary: #332D41;
+    --md-sys-color-secondary-container: #4A4458;
+    --md-sys-color-on-secondary-container: #E8DEF8;
+    --md-sys-color-tertiary: #EFB8C8;
+    --md-sys-color-on-tertiary: #492532;
+    --md-sys-color-tertiary-container: #633B48;
+    --md-sys-color-on-tertiary-container: #FFD8E4;
+    --md-sys-color-error: #F2B8B5;
+    --md-sys-color-on-error: #601410;
+    --md-sys-color-error-container: #8C1D18;
+    --md-sys-color-on-error-container: #F9DEDC;
+    --md-sys-color-background: #1C1B1F;
+    --md-sys-color-on-background: #E6E1E5;
+    --md-sys-color-surface: #1C1B1F;
+    --md-sys-color-on-surface: #E6E1E5;
+    --md-sys-color-surface-variant: #49454F;
+    --md-sys-color-on-surface-variant: #CAC4D0;
+    --md-sys-color-outline: #938F99;
+    --md-sys-color-outline-variant: #49454F;
+    --md-sys-color-shadow: #000000;
+    --md-sys-color-scrim: #000000;
+    --md-sys-color-inverse-surface: #E6E1E5;
+    --md-sys-color-inverse-on-surface: #313033;
+    --md-sys-color-inverse-primary: #6750A4;
+    --md-sys-color-surface-dim: #141218;
+    --md-sys-color-surface-bright: #3B383E;
+    --md-sys-color-surface-container-lowest: #0F0D13;
+    --md-sys-color-surface-container-low: #1D1B20;
+    --md-sys-color-surface-container: #211F26;
+    --md-sys-color-surface-container-high: #2B2931;
+    --md-sys-color-surface-container-highest: #36343B;
 }
 
 .sidebar {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    width: 300px;
-    border-right: 1px solid #ddd;
 }
 
-.workspace-list {
+.sidebar-header {
     display: flex;
     align-items: center;
-    padding: 10px;
-    background-color: #f5f5f5;
-    border-bottom: 1px solid #ddd;
+    padding: 8px;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    flex-shrink: 0;
 }
 
-.workspace-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #ccc;
-    margin-right: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    cursor: pointer;
-    border: 2px solid transparent;
-}
-
-.workspace-icon.active {
-    border-color: #007bff;
-}
-
-.sidebar-controls {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.add-tab-btn {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.add-tab-btn:hover {
-    background-color: #0056b3;
-}
-
-.create-workspace-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 1px dashed #999;
-    background-color: transparent;
-    font-size: 24px;
-    color: #999;
-    cursor: pointer;
+md-tabs {
+    flex-grow: 1;
+    --md-primary-tab-container-color: transparent;
 }
 
 .tab-list {
@@ -72,24 +71,25 @@ body {
     overflow-y: auto;
 }
 
-.tab-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    border-bottom: 1px solid #eee;
+md-list-item {
     cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.tab-item:hover {
-    background-color: #f0f0f0;
+md-list-item .favicon {
+    width: 24px;
+    height: 24px;
 }
 
-.favicon {
-    width: 16px;
-    height: 16px;
-    margin-right: 10px;
+.sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--md-sys-color-outline-variant);
     flex-shrink: 0;
+}
+
+md-dialog {
+    --md-dialog-container-color: var(--md-sys-color-surface-container-high);
+}
+
+md-filled-text-field {
+    width: 100%;
 }
