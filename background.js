@@ -73,3 +73,45 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // To indicate that we will respond asynchronously.
   return true;
 });
+
+const ACTIVE_WORKSPACE_ID_KEY = 'activeWorkspaceId';
+
+// Listener for when a new tab is created
+chrome.tabs.onCreated.addListener(async (tab) => {
+    const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
+    if (!activeWorkspaceId) {
+        return; // Do nothing if no workspace is active
+    }
+
+    let { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
+    const workspaceIndex = workspaces.findIndex(w => w.id === activeWorkspaceId);
+
+    if (workspaceIndex !== -1) {
+        // Add the new tab to the active workspace
+        workspaces[workspaceIndex].tabs.push(tab.id);
+        await chrome.storage.local.set({ workspaces });
+        // Notify sidebar to refresh
+        chrome.runtime.sendMessage({ action: "refresh" });
+    }
+});
+
+// Listener for when a tab is closed
+chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
+    let { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
+    let changed = false;
+
+    // Find the tab in any workspace and remove it
+    workspaces.forEach(workspace => {
+        const tabIndex = workspace.tabs.indexOf(tabId);
+        if (tabIndex > -1) {
+            workspace.tabs.splice(tabIndex, 1);
+            changed = true;
+        }
+    });
+
+    if (changed) {
+        await chrome.storage.local.set({ workspaces });
+        // Notify sidebar to refresh
+        chrome.runtime.sendMessage({ action: "refresh" });
+    }
+});
