@@ -23,14 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         workspaces.forEach(workspace => {
-            const card = document.createElement('a');
-            card.className = 'card workspace-card';
-            card.href = '#'; // In a real scenario, this might activate the workspace
+            const card = document.createElement('md-elevated-card');
             card.dataset.workspaceId = workspace.id;
             card.innerHTML = `
-                <div class="icon">${workspace.name.charAt(0).toUpperCase()}</div>
-                <div class="title">${workspace.name}</div>
+                <div class="card-content">
+                    <div class="icon">${workspace.name.charAt(0).toUpperCase()}</div>
+                    <div class="title">${workspace.name}</div>
+                </div>
             `;
+            // In a real scenario, this would open the workspace. For now, it does nothing.
             grid.appendChild(card);
         });
     }
@@ -43,14 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         bookmarks.slice(0, 6).forEach(bookmark => { // Show up to 6 bookmarks
-            const card = document.createElement('a');
-            card.className = 'card bookmark-card';
-            card.href = bookmark.url;
-            card.target = '_blank';
+            const card = document.createElement('md-elevated-card');
+            card.className = 'bookmark-card';
             card.innerHTML = `
-                <img class="icon" src="https://www.google.com/s2/favicons?domain=${new URL(bookmark.url).hostname}" alt="">
-                <div class="title">${bookmark.title}</div>
+                <div class="card-content">
+                    <img class="icon" src="https://www.google.com/s2/favicons?sz=32&domain=${new URL(bookmark.url).hostname}" alt="">
+                    <div class="title">${bookmark.title}</div>
+                </div>
             `;
+            card.addEventListener('click', () => window.open(bookmark.url, '_blank'));
             grid.appendChild(card);
         });
     }
@@ -64,13 +66,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         sessions.slice(0, 10).forEach(session => { // Show up to 10 tabs
             if (session.tab) {
-                const item = document.createElement('a');
-                item.className = 'list-item recent-tab-item';
+                const item = document.createElement('md-list-item');
+                item.headline = session.tab.title;
                 item.href = session.tab.url;
                 item.target = '_blank';
                 item.innerHTML = `
-                    <img class="favicon" src="https://www.google.com/s2/favicons?domain=${new URL(session.tab.url).hostname}" alt="">
-                    <div class="title">${session.tab.title}</div>
+                    <img slot="start" class="favicon" src="https://www.google.com/s2/favicons?sz=32&domain=${new URL(session.tab.url).hostname}" alt="">
+                    ${session.tab.title}
                 `;
                 list.appendChild(item);
             }
