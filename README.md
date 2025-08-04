@@ -1,20 +1,18 @@
 # chrome-eazy
 
-**Supercharge your browser workflow by transforming your Chrome windows into distinct, color-coded workspaces.**
+**Supercharge your browser workflow by organizing your tabs into clean, distinct workspaces.**
 
-`chrome-eazy` is a Chrome extension designed for users who juggle multiple projects, tasks, or contexts. It allows you to assign a unique name and color to each Chrome window, creating a persistent visual indicator that helps you instantly recognize and switch between your workspaces.
-
-![Demo Image](chrome-eazy-product-mock-image.png)
+`chrome-eazy` is a Chrome extension for users who juggle multiple projects or contexts. It uses the Side Panel API to create a central hub for managing "workspaces"—logical groups of tabs that you can switch between instantly.
 
 ---
 
 ## Features
 
-- **🎨 Name & Color-Code Windows:** Assign a memorable name and a distinct color to any Chrome window to create a "workspace".
-- **📌 Persistent Visual Headers:** A clean, colored header with the workspace name is injected at the top of every tab within a workspace, ensuring you never lose context.
-- **🏠 Workspace Homepage:** A beautiful, grid-based homepage gives you a bird's-eye view of all your active workspaces and the tabs within them.
-- **⚡️ Quick Navigation:** Click on any tab from the homepage to instantly jump to that tab and focus its window.
-- **🧹 Automatic Cleanup:** Workspace data is automatically removed from storage when you close a window, keeping things tidy.
+- **✅ Workspace Management:** Create and name workspaces to group your tabs by task, project, or any other category.
+- **🚀 One-Click Switching:** Activate a workspace to instantly bring all its tabs into focus while hiding others.
+- **🙈 Automatic Tab Hiding:** Inactive workspaces have their tabs neatly tucked away into a collapsed tab group, reducing clutter.
+- **➕ Easily Add Tabs:** Add the current tab to your active workspace with a single click.
+- **🗂️ Centralized View:** See all your workspaces and the tabs within the active one, all from the comfort of the Chrome Side Panel.
 
 ---
 
@@ -24,28 +22,43 @@ Since the extension is in active development, you'll need to load it manually in
 
 1.  **Download the Code:** Clone or download this repository to your local machine.
     ```bash
-    git clone [https://github.com/toxicoder/chrome-eazy.git](https://github.com/toxicoder/chrome-eazy.git)
+    git clone https://github.com/toxicoder/chrome-eazy.git
     ```
 2.  **Open Chrome Extensions:** Open Google Chrome and navigate to `chrome://extensions`.
 3.  **Enable Developer Mode:** In the top-right corner of the Extensions page, toggle on **Developer mode**.
 4.  **Load the Extension:** Click the **"Load unpacked"** button that appears and select the `chrome-eazy` directory you just downloaded.
 
-The `chrome-eazy` icon should now appear in your Chrome toolbar.
+The `chrome-eazy` icon should now appear in your Chrome toolbar. Clicking it will open the Side Panel.
 
 ---
 
 ## How to Use
 
-1.  **Create a Workspace:**
-    - Click the `chrome-eazy` icon in your Chrome toolbar to open the popup.
-    - Give your current window a name (e.g., "Project Phoenix", "Social Media").
-    - Pick a color that you'll associate with this workspace.
-    - Click **"Save & Apply"**. A colored header will now appear on all tabs in this window.
+1.  **Open the Side Panel:** Click the `chrome-eazy` extension icon in your toolbar to open the Side Panel.
+2.  **Create a Workspace:**
+    - Click the **"Create Workspace"** button.
+    - Enter a name for your new workspace (e.g., "Project Phoenix," "Social Media").
+    - The new workspace will appear in the list. The first one you create is automatically activated.
+3.  **Add Tabs to a Workspace:**
+    - Make sure the desired workspace is active (it will be highlighted).
+    - Navigate to the tab you want to add.
+    - In the side panel, click the **"Add Current Tab"** button.
+    - The tab will now appear in the list for the active workspace.
+4.  **Switch Between Workspaces:**
+    - Simply click on any workspace icon in the side panel.
+    - The tabs for the selected workspace will become visible, and all other workspace tabs will be hidden.
 
-2.  **View All Workspaces:**
-    - In the popup, click the **"View All Workspaces"** link.
-    - This opens the homepage where you can see all your active workspaces in a grid.
-    - Click any tab listed on the homepage to switch directly to it.
+---
+
+## How It Works
+
+`chrome-eazy` leverages several modern Chrome Extension APIs to provide a seamless experience:
+
+-   **`chrome.sidePanel`**: This API is used to create the main user interface, which lives in the browser's side panel. The UI is built with HTML, CSS, and JavaScript (`sidebar.html`, `sidebar.css`, `sidebar.js`).
+-   **`chrome.storage.local`**: All workspace data, including the list of workspaces and the tabs they contain, is stored in the browser's local storage. This ensures your workspaces persist across browser sessions.
+-   **`chrome.tabGroups`**: This is the magic behind showing and hiding tabs. When you switch to a new workspace, the tabs from all other workspaces are grouped together into a single, collapsed group titled "Inactive Workspaces". When you switch back, tabs are ungrouped and restored.
+-   **`background.js`**: This is the service worker that runs in the background. It listens for browser events (like a tab closing) to keep the workspace data in sync and handles the core logic of showing and hiding tabs by communicating with the `tabGroups` API.
+-   **`sidebar.js`**: This script manages the entire side panel UI. It's responsible for rendering the list of workspaces and tabs, handling user clicks, and communicating with the background script to trigger actions.
 
 ---
 
