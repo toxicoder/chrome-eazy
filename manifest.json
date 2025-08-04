@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Side Panel Extension",
+  "name": "chrome-eazy",
   "version": "1.0",
-  "description": "A simple extension to demonstrate the Side Panel API.",
+  "description": "A browser extension to organize your tabs into clean workspaces.",
   "permissions": ["sidePanel", "tabGroups", "tabs", "storage"],
   "action": {
     "default_title": "Open side panel"
