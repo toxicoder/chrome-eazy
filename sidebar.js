@@ -155,5 +155,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     addTabBtn.addEventListener('click', addCurrentTabToActiveWorkspace);
 
+    // Listen for messages from the background script
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if (request.action === 'refresh') {
+            renderWorkspaces();
+        }
+    });
+
     renderWorkspaces();
 });
