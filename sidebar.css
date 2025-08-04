@@ -73,11 +73,23 @@ body {
 }
 
 .tab-item {
-    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
     border-bottom: 1px solid #eee;
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .tab-item:hover {
     background-color: #f0f0f0;
+}
+
+.favicon {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    flex-shrink: 0;
 }

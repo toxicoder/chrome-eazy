@@ -29,30 +29,64 @@ document.addEventListener('DOMContentLoaded', function() {
         renderTabsForActiveWorkspace();
     }
 
-    async function renderTabsForActiveWorkspace() {
-        const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
-        const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
+    async function renderTabs(tabIds) {
+        tabList.innerHTML = ''; // Clear existing tabs
 
-        tabList.innerHTML = '';
+        if (!tabIds || tabIds.length === 0) {
+            tabList.innerHTML = '<div class="tab-item">No tabs in this workspace yet.</div>';
+            return;
+        }
 
-        const activeWorkspace = workspaces.find(w => w.id === activeWorkspaceId);
+        try {
+            // Filter out any invalid tab IDs that might have been stored.
+            const validTabIds = tabIds.filter(id => typeof id === 'number');
+            if (validTabIds.length === 0) {
+                tabList.innerHTML = '<div class="tab-item">No tabs in this workspace yet.</div>';
+                return;
+            }
 
-        if (activeWorkspace && activeWorkspace.tabs.length > 0) {
-            const tabsInfo = await chrome.tabs.get(activeWorkspace.tabs.filter(t => typeof t === 'number'));
+            const tabsInfo = await chrome.tabs.get(validTabIds);
             tabsInfo.forEach(tab => {
                 const tabEl = document.createElement('div');
                 tabEl.className = 'tab-item';
-                tabEl.textContent = tab.title;
                 tabEl.title = tab.title;
                 tabEl.dataset.tabId = tab.id;
+
+                // Add favicon if it exists
+                if (tab.favIconUrl) {
+                    const favicon = document.createElement('img');
+                    favicon.src = tab.favIconUrl;
+                    favicon.className = 'favicon';
+                    tabEl.appendChild(favicon);
+                }
+
+                const tabTitle = document.createElement('span');
+                tabTitle.textContent = tab.title;
+                tabEl.appendChild(tabTitle);
+
                 tabEl.addEventListener('click', () => {
                     chrome.tabs.update(tab.id, { active: true });
                     chrome.windows.update(tab.windowId, { focused: true });
                 });
                 tabList.appendChild(tabEl);
             });
+        } catch (error) {
+            console.error("Error rendering tabs:", error);
+            // This can happen if a tab was closed but not yet removed from the workspace data.
+            tabList.innerHTML = '<div class="tab-item">Could not load all tabs. They may have been closed.</div>';
+        }
+    }
+
+    async function renderTabsForActiveWorkspace() {
+        const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
+        const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
+
+        const activeWorkspace = workspaces.find(w => w.id === activeWorkspaceId);
+
+        if (activeWorkspace && activeWorkspace.tabs) {
+            renderTabs(activeWorkspace.tabs);
         } else {
-            tabList.innerHTML = '<div class="tab-item">No tabs in this workspace yet.</div>';
+            renderTabs([]); // Render empty state
         }
     }
 
