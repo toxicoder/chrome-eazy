@@ -29,6 +29,31 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: bold;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.workspace-icon.active {
+    border-color: #007bff;
+}
+
+.sidebar-controls {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.add-tab-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-tab-btn:hover {
+    background-color: #0056b3;
 }
 
 .create-workspace-btn {
