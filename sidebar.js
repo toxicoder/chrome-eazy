@@ -65,18 +65,31 @@ document.addEventListener('DOMContentLoaded', function() {
         await chrome.storage.local.set({ [ACTIVE_WORKSPACE_ID_KEY]: workspaceId });
 
         const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
+        const allTabs = await chrome.tabs.query({});
+        const allTabIds = new Set(allTabs.map(t => t.id));
+
+        let workspacesNeedUpdate = false;
 
         const tabsToShow = [];
         const tabsToHide = [];
 
         for (const workspace of workspaces) {
-            // Ensure tabs array exists and is an array
+            const originalTabCount = workspace.tabs.length;
+            workspace.tabs = workspace.tabs.filter(tabId => allTabIds.has(tabId));
+            if(workspace.tabs.length !== originalTabCount) {
+                workspacesNeedUpdate = true;
+            }
+
             const workspaceTabs = Array.isArray(workspace.tabs) ? workspace.tabs : [];
             if (workspace.id === workspaceId) {
                 tabsToShow.push(...workspaceTabs);
             } else {
                 tabsToHide.push(...workspaceTabs);
             }
+        }
+
+        if (workspacesNeedUpdate) {
+            await chrome.storage.local.set({ workspaces });
         }
 
         chrome.runtime.sendMessage({ action: 'showTabs', tabIds: tabsToShow });
