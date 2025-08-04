@@ -1,7 +1,8 @@
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
-    .catch((error) => console.error(error));
-});
+// Ensure the side panel is always available to be opened on action click.
+// This is idempotent, so it's safe to call on every service worker startup.
+chrome.sidePanel
+  .setPanelBehavior({ openPanelOnActionClick: true })
+  .catch((error) => console.error(error));
 
 const HIDDEN_GROUP_TITLE = "Inactive Workspaces";
 

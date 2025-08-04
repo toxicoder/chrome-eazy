@@ -12,9 +12,7 @@
     "history",
     "sessions"
   ],
-  "action": {
-    "default_title": "Open side panel"
-  },
+  "action": {},
   "background": {
     "service_worker": "background.js"
   },
