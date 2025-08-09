@@ -112,6 +112,10 @@ md-elevated-card {
 .card-content .icon {
     width: 40px;
     height: 40px;
+    flex-shrink: 0;
+}
+
+.card-content div.icon {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -119,7 +123,10 @@ md-elevated-card {
     background-color: var(--md-sys-color-primary-container);
     color: var(--md-sys-color-on-primary-container);
     font-size: 1.25rem;
-    flex-shrink: 0;
+}
+
+.card-content img.icon {
+    border-radius: 4px;
 }
 
 .card-content .title {
