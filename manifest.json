@@ -1,16 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "chrome-eazy",
+  "name": "Chrome Eazy (Dev)",
   "version": "1.0",
   "description": "A browser extension to organize your tabs into clean workspaces.",
   "permissions": [
     "sidePanel",
     "tabGroups",
     "tabs",
-    "storage",
-    "bookmarks",
-    "history",
-    "sessions"
+    "storage"
   ],
   "action": {},
   "background": {
