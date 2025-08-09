@@ -10,6 +10,7 @@
         import 'https://cdn.jsdelivr.net/npm/@material/web/button/filled-button.js';
         import 'https://cdn.jsdelivr.net/npm/@material/web/button/outlined-button.js';
         import 'https://cdn.jsdelivr.net/npm/@material/web/button/icon-button.js';
+        import 'https://cdn.jsdelivr.net/npm/@material/web/fab/fab.js';
         import 'https://cdn.jsdelivr.net/npm/@material/web/list/list.js';
         import 'https://cdn.jsdelivr.net/npm/@material/web/list/list-item.js';
         import 'https://cdn.jsdelivr.net/npm/@material/web/dialog/dialog.js';
@@ -23,23 +24,23 @@
     <div class="sidebar">
         <div class="sidebar-header">
             <md-tabs class="workspace-tabs">
-                <!-- Workspace tabs will be dynamically loaded here -->
             </md-tabs>
-            <md-icon-button id="create-workspace-btn">
-                <md-icon>add</md-icon>
-            </md-icon-button>
         </div>
 
         <md-list class="tab-list">
-            <!-- Tabs for the active workspace will go here -->
         </md-list>
 
         <div class="sidebar-footer">
              <md-filled-button id="add-tab-btn" style="width: 100%;">
                 Add Current Tab
+                <md-icon slot="icon">add</md-icon>
             </md-filled-button>
         </div>
     </div>
+
+    <md-fab variant="primary" id="create-workspace-btn" aria-label="Create new workspace">
+        <md-icon slot="icon">add</md-icon>
+    </md-fab>
 
     <md-dialog id="create-workspace-dialog">
         <div slot="headline">Create a new workspace</div>
