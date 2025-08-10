@@ -197,9 +197,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // of components that haven't been fully initialized yet.
     Promise.all([
         customElements.whenDefined('md-filled-button'),
-        customElements.whenDefined('md-dialog'),
-        customElements.whenDefined('md-tabs'),
+        customElements.whenDefined('md-outlined-button'),
+        customElements.whenDefined('md-icon-button'),
         customElements.whenDefined('md-fab'),
+        customElements.whenDefined('md-list'),
+        customElements.whenDefined('md-list-item'),
+        customElements.whenDefined('md-dialog'),
+        customElements.whenDefined('md-filled-text-field'),
+        customElements.whenDefined('md-tabs'),
+        customElements.whenDefined('md-primary-tab'),
+        customElements.whenDefined('md-icon'),
     ]).then(main).catch(error => {
         console.error('One or more Material Web Components failed to load.', error);
     });
