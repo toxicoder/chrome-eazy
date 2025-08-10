@@ -106,30 +106,35 @@ async function handleWorkspaceActivation(activeWorkspaceId) {
     await hideTabs(tabsToHide);
     await showTabs(tabsToShow);
 
-    // Refresh the sidebar to show the correct state
-    chrome.runtime.sendMessage({ action: "refresh" });
+    // Refresh the sidebar to show the correct state.
+    // NOTE: This was removed because the sidebar now optimistically updates itself.
+    // The refresh message caused a jarring re-render. Other refresh triggers remain.
+    // chrome.runtime.sendMessage({ action: "refresh" });
 }
 
 const ACTIVE_WORKSPACE_ID_KEY = 'activeWorkspaceId';
 
-// Listener for when a new tab is created
-chrome.tabs.onCreated.addListener(async (tab) => {
-    const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
-    if (!activeWorkspaceId) {
-        return; // Do nothing if no workspace is active
-    }
-
-    let { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
-    const workspaceIndex = workspaces.findIndex(w => w.id === activeWorkspaceId);
-
-    if (workspaceIndex !== -1) {
-        // Add the new tab to the active workspace
-        workspaces[workspaceIndex].tabs.push(tab.id);
-        await chrome.storage.local.set({ workspaces });
-        // Notify sidebar to refresh
-        chrome.runtime.sendMessage({ action: "refresh" });
-    }
-});
+// Listener for when a new tab is created.
+// NOTE: This feature is commented out as it can be intrusive. It automatically
+// adds any new tab to the active workspace, which might not be the desired
+// behavior for all users. It can be re-enabled if this is a desired feature.
+// chrome.tabs.onCreated.addListener(async (tab) => {
+//     const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
+//     if (!activeWorkspaceId) {
+//         return; // Do nothing if no workspace is active
+//     }
+//
+//     let { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
+//     const workspaceIndex = workspaces.findIndex(w => w.id === activeWorkspaceId);
+//
+//     if (workspaceIndex !== -1) {
+//         // Add the new tab to the active workspace
+//         workspaces[workspaceIndex].tabs.push(tab.id);
+//         await chrome.storage.local.set({ workspaces });
+//         // Notify sidebar to refresh
+//         chrome.runtime.sendMessage({ action: "refresh" });
+//     }
+// });
 
 // Listener for when a tab is closed
 chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {

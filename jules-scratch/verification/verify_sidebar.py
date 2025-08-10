@@ -15,6 +15,8 @@ async def main():
         )
         page = await browser_context.new_page()
         await page.goto(f"file://{os.getcwd()}/sidebar.html")
+        # Wait for the web components to load
+        await page.wait_for_timeout(3000)
         await page.screenshot(path="jules-scratch/verification/verification.png")
         await browser_context.close()
 

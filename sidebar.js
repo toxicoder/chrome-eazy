@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const createWorkspaceBtn = document.getElementById('create-workspace-btn');
     const createWorkspaceDialog = document.getElementById('create-workspace-dialog');
     const workspaceNameInput = document.getElementById('workspace-name-input');
@@ -12,25 +12,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
         const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
 
+        const activeWorkspace = workspaces.find(w => w.id === activeWorkspaceId);
+
         workspaceTabs.innerHTML = ''; // Clear existing workspaces
         if (workspaces.length === 0) {
-            // Handle empty state if necessary, maybe a placeholder in the tabs area
+            // Handle empty state
+        } else {
+            workspaces.forEach(workspace => {
+                const tab = document.createElement('md-primary-tab');
+                tab.dataset.workspaceId = workspace.id;
+                tab.innerHTML = `
+                    <md-icon slot="icon">folder</md-icon>
+                    ${workspace.name}
+                `;
+                if (workspace.id === activeWorkspaceId) {
+                    tab.active = true;
+                }
+                workspaceTabs.appendChild(tab);
+            });
         }
 
-        workspaces.forEach(workspace => {
-            const tab = document.createElement('md-primary-tab');
-            tab.dataset.workspaceId = workspace.id;
-            tab.innerHTML = `
-                <div slot="icon"></div>
-                ${workspace.name}
-            `;
-            if (workspace.id === activeWorkspaceId) {
-                tab.active = true;
-            }
-            workspaceTabs.appendChild(tab);
-        });
-
-        renderTabsForActiveWorkspace();
+        renderTabs(activeWorkspace ? activeWorkspace.tabs : []);
     }
 
     async function renderTabs(tabIds) {
@@ -47,7 +49,8 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const validTabIds = tabIds.filter(id => typeof id === 'number');
             if (validTabIds.length === 0) {
-                return renderTabs([]); // Recurse with empty to show placeholder
+                renderTabs([]); // Recurse with empty to show placeholder
+                return;
             }
 
             const tabsInfo = await chrome.tabs.get(validTabIds);
@@ -100,16 +103,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    async function renderTabsForActiveWorkspace() {
-        const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
-        const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
-        const activeWorkspace = workspaces.find(w => w.id === activeWorkspaceId);
-        renderTabs(activeWorkspace ? activeWorkspace.tabs : []);
-    }
-
-    function handleWorkspaceTabChange(event) {
-        const selectedTab = event.target.activeTab;
-        if (selectedTab) {
+    function handleWorkspaceTabChange() {
+        const selectedTab = workspaceTabs.activeTab;
+        if (selectedTab && selectedTab.dataset.workspaceId) {
             const workspaceId = selectedTab.dataset.workspaceId;
             activateWorkspace(workspaceId);
         }
@@ -117,10 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function activateWorkspace(workspaceId) {
         await chrome.storage.local.set({ [ACTIVE_WORKSPACE_ID_KEY]: workspaceId });
-        // The message passing logic to show/hide tabs can be complex and depends
-        // on the background script. For now, we'll just re-render the UI.
-        // A more robust solution would involve messaging the background script
-        // to handle tab visibility based on the active workspace.
+        await renderWorkspaces();
         chrome.runtime.sendMessage({ action: 'workspaceActivated', workspaceId });
     }
 
@@ -146,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!activeWorkspace.tabs.includes(currentTab.id)) {
                 activeWorkspace.tabs.push(currentTab.id);
                 await chrome.storage.local.set({ workspaces });
-                renderTabsForActiveWorkspace();
+                await renderWorkspaces();
             } else {
                 alert('This tab is already in the active workspace.');
             }
