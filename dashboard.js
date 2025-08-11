@@ -19,7 +19,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('workspaces-grid');
         grid.innerHTML = '';
         if (!workspaces || workspaces.length === 0) {
-            grid.innerHTML = '<p class="placeholder">No workspaces created yet.</p>';
+            grid.innerHTML = `
+                <div class="empty-state-container">
+                    <md-icon>space_dashboard</md-icon>
+                    <h3>No Workspaces</h3>
+                    <p>Click the extension icon to open the side panel and create one!</p>
+                </div>
+            `;
             return;
         }
         workspaces.forEach(workspace => {
@@ -27,8 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.workspaceId = workspace.id;
             card.innerHTML = `
                 <div class="card-content">
-                    <div class="icon">${workspace.name.charAt(0).toUpperCase()}</div>
-                    <div class="title">${workspace.name}</div>
+                    <md-icon>space_dashboard</md-icon>
+                    <div class="text-content">
+                        <div class="title">${workspace.name}</div>
+                    </div>
                 </div>
             `;
             // In a real scenario, this would open the workspace. For now, it does nothing.
@@ -40,16 +48,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('bookmarks-grid');
         grid.innerHTML = '';
         if (!bookmarks || bookmarks.length === 0) {
-            grid.innerHTML = '<p class="placeholder">No recent bookmarks found.</p>';
+            grid.innerHTML = `
+                <div class="empty-state-container">
+                    <md-icon>bookmark</md-icon>
+                    <h3>No Recent Bookmarks</h3>
+                    <p>Your recently added bookmarks will appear here.</p>
+                </div>
+            `;
             return;
         }
         bookmarks.slice(0, 6).forEach(bookmark => { // Show up to 6 bookmarks
             const card = document.createElement('md-elevated-card');
             card.className = 'bookmark-card';
+            const hostname = new URL(bookmark.url).hostname;
             card.innerHTML = `
                 <div class="card-content">
-                    <img class="icon" src="https://www.google.com/s2/favicons?sz=32&domain=${new URL(bookmark.url).hostname}" alt="">
-                    <div class="title">${bookmark.title || new URL(bookmark.url).hostname}</div>
+                    <img class="icon" src="https://www.google.com/s2/favicons?sz=32&domain=${hostname}" alt="">
+                    <div class="text-content">
+                        <div class="title">${bookmark.title || hostname}</div>
+                        <div class="hostname">${hostname}</div>
+                    </div>
                 </div>
             `;
             card.addEventListener('click', () => chrome.tabs.create({ url: bookmark.url }));

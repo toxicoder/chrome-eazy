@@ -65,7 +65,7 @@ body.dark {
 }
 
 .dashboard-header h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
 }
@@ -106,12 +106,14 @@ md-elevated-card {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 16px;
+    padding: 20px;
 }
 
-.card-content .icon {
+.card-content .icon,
+.card-content md-icon {
     width: 40px;
     height: 40px;
+    font-size: 24px; /* For md-icon */
     flex-shrink: 0;
 }
 
@@ -129,13 +131,27 @@ md-elevated-card {
     border-radius: 4px;
 }
 
+.card-content .text-content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prevent text from overflowing */
+}
+
 .card-content .title {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-weight: 500;
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: var(--md-sys-color-on-surface);
+}
+
+.card-content .hostname {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.875rem;
+    color: var(--md-sys-color-on-surface-variant);
 }
 
 /* List Item Styles */
@@ -154,4 +170,37 @@ md-list-item .favicon {
     text-align: center;
     padding: 2rem;
     grid-column: 1 / -1;
+}
+
+.empty-state-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 2rem;
+    border-radius: 12px;
+    background-color: var(--md-sys-color-surface-container);
+    grid-column: 1 / -1; /* Span full grid width */
+}
+
+.empty-state-container md-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--md-sys-color-on-surface-variant);
+    opacity: 0.7;
+}
+
+.empty-state-container h3 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 1rem 0 0.25rem;
+    color: var(--md-sys-color-on-surface);
+}
+
+.empty-state-container p {
+    font-size: 1rem;
+    color: var(--md-sys-color-on-surface-variant);
+    max-width: 400px;
 }

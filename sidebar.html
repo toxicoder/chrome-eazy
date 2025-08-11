@@ -27,24 +27,22 @@
         </div>
 
         <div class="nav-drawer-content">
-            <md-tabs class="workspace-tabs">
-            </md-tabs>
-
-            <md-list class="tab-list">
-            </md-list>
-        </div>
-
-
-        <div class="nav-drawer-footer">
             <md-filled-button id="add-tab-btn">
                 Add Current Tab
                 <md-icon slot="icon">add</md-icon>
             </md-filled-button>
+
+            <md-list class="workspace-list">
+                <!-- Workspaces will be rendered here -->
+            </md-list>
+
+            <md-list class="tab-list">
+            </md-list>
         </div>
     </div>
 
     <md-fab variant="primary" id="create-workspace-btn" aria-label="Create new workspace">
-        <md-icon slot="icon">add</md-icon>
+        <md-icon slot="icon">create_new_folder</md-icon>
     </md-fab>
 
     <md-dialog id="create-workspace-dialog">
