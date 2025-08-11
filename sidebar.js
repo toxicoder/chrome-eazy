@@ -1,14 +1,14 @@
-import '@material/web/list/list.js';
-import '@material/web/list/list-item.js';
-import '@material/web/icon/icon.js';
-import '@material/web/iconbutton/icon-button.js';
-import '@material/web/fab/fab.js';
-import '@material/web/dialog/dialog.js';
-import '@material/web/button/outlined-button.js';
-import '@material/web/button/filled-button.js';
-import '@material/web/textfield/filled-text-field.js';
-import '@material/web/menu/menu.js';
-import '@material/web/menu/menu-item.js';
+import 'https://esm.run/@material/web/list/list.js';
+import 'https://esm.run/@material/web/list/list-item.js';
+import 'https://esm.run/@material/web/icon/icon.js';
+import 'https://esm.run/@material/web/iconbutton/icon-button.js';
+import 'https://esm.run/@material/web/fab/fab.js';
+import 'https://esm.run/@material/web/dialog/dialog.js';
+import 'https://esm.run/@material/web/button/outlined-button.js';
+import 'https://esm.run/@material/web/button/filled-button.js';
+import 'https://esm.run/@material/web/textfield/filled-text-field.js';
+import 'https://esm.run/@material/web/menu/menu.js';
+import 'https://esm.run/@material/web/menu/menu-item.js';
 
 // --- Inside your main function ---
 const workspaceList = document.querySelector('.workspace-list');
