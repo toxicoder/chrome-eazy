@@ -16,7 +16,7 @@
     "service_worker": "background.js"
   },
   "side_panel": {
-    "default_path": "dist/sidebar.html"
+    "default_path": "sidebar.html"
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"
