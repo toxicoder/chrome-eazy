@@ -1,3 +1,8 @@
+import 'https://esm.run/@material/web/list/list.js';
+import 'https://esm.run/@material/web/list/list-item.js';
+import 'https://esm.run/@material/web/card/elevated-card.js';
+import 'https://esm.run/@material/web/icon/icon.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- Greeting ---
     function setGreeting() {

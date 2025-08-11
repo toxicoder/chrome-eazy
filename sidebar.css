@@ -115,3 +115,18 @@ md-dialog {
 md-filled-text-field {
     width: 100%;
 }
+
+#snackbar-dialog {
+    --md-dialog-container-color: var(--md-sys-color-inverse-surface);
+    color: var(--md-sys-color-inverse-on-surface);
+    min-width: unset;
+    position: fixed;
+    bottom: 24px;
+    /* The sidebar width is 320px, so center relative to that */
+    left: 160px;
+    transform: translateX(-50%);
+    border-radius: 4px;
+}
+.snackbar-message {
+    padding: 14px 16px;
+}

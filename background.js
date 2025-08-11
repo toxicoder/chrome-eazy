@@ -112,25 +112,6 @@ async function handleWorkspaceActivation(activeWorkspaceId) {
 
 const ACTIVE_WORKSPACE_ID_KEY = 'activeWorkspaceId';
 
-// Listener for when a new tab is created
-chrome.tabs.onCreated.addListener(async (tab) => {
-    const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
-    if (!activeWorkspaceId) {
-        return; // Do nothing if no workspace is active
-    }
-
-    let { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
-    const workspaceIndex = workspaces.findIndex(w => w.id === activeWorkspaceId);
-
-    if (workspaceIndex !== -1) {
-        // Add the new tab to the active workspace
-        workspaces[workspaceIndex].tabs.push(tab.id);
-        await chrome.storage.local.set({ workspaces });
-        // Notify sidebar to refresh
-        chrome.runtime.sendMessage({ action: "refresh" });
-    }
-});
-
 // Listener for when a tab is closed
 chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
     let { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });

@@ -1,3 +1,10 @@
+import '@material/web/all.js';
+import {
+    styles as typescaleStyles
+} from '@material/web/typography/md-typescale-styles.js';
+
+document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+
 // The main logic for the sidebar.
 function main() {
     const createWorkspaceBtn = document.getElementById('create-workspace-btn');
@@ -9,6 +16,20 @@ function main() {
     const tabs = document.querySelector('md-tabs');
 
     const ACTIVE_WORKSPACE_ID_KEY = 'activeWorkspaceId';
+
+    function showSnackbar(message) {
+        const snackbar = document.getElementById('snackbar-dialog');
+        const messageElement = document.getElementById('snackbar-message');
+        if (!snackbar || !messageElement) return;
+
+        messageElement.textContent = message;
+        snackbar.show();
+
+        // Automatically close after 3 seconds
+        setTimeout(() => {
+            snackbar.close();
+        }, 3000);
+    }
 
     async function renderWorkspaces() {
         const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
@@ -36,6 +57,27 @@ function main() {
                 if (workspace.id === activeWorkspaceId) {
                     item.classList.add('active');
                 }
+
+                const editButton = document.createElement('md-icon-button');
+                editButton.innerHTML = '<md-icon>edit</md-icon>';
+                editButton.slot = 'end';
+                editButton.dataset.workspaceId = workspace.id;
+                editButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    handleEditWorkspace(workspace);
+                });
+
+                const deleteButton = document.createElement('md-icon-button');
+                deleteButton.innerHTML = '<md-icon>delete</md-icon>';
+                deleteButton.slot = 'end';
+                deleteButton.dataset.workspaceId = workspace.id;
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    handleDeleteWorkspace(workspace);
+                });
+
+                item.appendChild(editButton);
+                item.appendChild(deleteButton);
                 workspaceList.appendChild(item);
             });
         }
@@ -165,12 +207,11 @@ function main() {
         const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
 
         if (!activeWorkspaceId) {
-            // TODO: Replace with a snackbar/toast notification
-            alert('Please select a workspace first!');
+            showSnackbar('Please select or create a workspace first!');
             return;
         }
         if (!currentTab) {
-            alert('No active tab found.');
+            showSnackbar('No active tab found.');
             return;
         }
 
@@ -182,10 +223,105 @@ function main() {
             if (!activeWorkspace.tabs.includes(currentTab.id)) {
                 activeWorkspace.tabs.push(currentTab.id);
                 await chrome.storage.local.set({ workspaces });
+                showSnackbar(`Tab added to "${activeWorkspace.name}".`);
                 renderTabsForActiveWorkspace();
             } else {
-                alert('This tab is already in the active workspace.');
+                showSnackbar('This tab is already in the active workspace.');
             }
+        }
+    }
+
+    // --- Workspace Management Functions ---
+
+    function handleDeleteWorkspace(workspace) {
+        const deleteDialog = document.getElementById('delete-confirm-dialog');
+        const confirmBtn = document.getElementById('delete-confirm-btn');
+        const cancelBtn = document.getElementById('delete-cancel-btn');
+
+        const confirmHandler = async () => {
+            await deleteWorkspace(workspace.id);
+            deleteDialog.close();
+        };
+
+        const cancelHandler = () => {
+            deleteDialog.close();
+        };
+
+        // Use { once: true } to auto-cleanup listeners after dialog interaction
+        confirmBtn.addEventListener('click', confirmHandler, { once: true });
+        cancelBtn.addEventListener('click', cancelHandler, { once: true });
+        deleteDialog.addEventListener('closed', () => {
+            // Remove listeners if the dialog was closed without a button click (e.g., ESC key)
+            confirmBtn.removeEventListener('click', confirmHandler);
+            cancelBtn.removeEventListener('click', cancelHandler);
+        }, { once: true });
+
+
+        deleteDialog.show();
+    }
+
+    async function deleteWorkspace(workspaceId) {
+        let { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
+        const workspaceToDelete = workspaces.find(w => w.id === workspaceId);
+
+        if (workspaceToDelete && workspaceToDelete.tabs && workspaceToDelete.tabs.length > 0) {
+            // Ungroup all tabs in the workspace
+            try {
+                // Filter for valid tab IDs that still exist
+                const allTabs = await chrome.tabs.query({});
+                const allTabIds = new Set(allTabs.map(t => t.id));
+                const tabsToUngroup = workspaceToDelete.tabs.filter(tabId => allTabIds.has(tabId));
+
+                if (tabsToUngroup.length > 0) {
+                    await chrome.tabs.ungroup(tabsToUngroup);
+                }
+            } catch (error) {
+                console.warn("Could not ungroup tabs. They might have been closed or already ungrouped.", error);
+            }
+        }
+
+        // Remove the workspace from the array
+        workspaces = workspaces.filter(w => w.id !== workspaceId);
+        await chrome.storage.local.set({ workspaces });
+
+        // If the deleted workspace was the active one, clear the active workspace
+        const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
+        if (activeWorkspaceId === workspaceId) {
+            await chrome.storage.local.remove(ACTIVE_WORKSPACE_ID_KEY);
+        }
+
+        showSnackbar(`Workspace "${workspaceToDelete.name}" deleted.`);
+        renderWorkspaces(); // Refresh the list
+    }
+
+    function handleEditWorkspace(workspace) {
+        const editDialog = document.getElementById('edit-workspace-dialog');
+        const editForm = document.getElementById('edit-workspace-form');
+        const editInput = document.getElementById('edit-workspace-name-input');
+
+        editInput.value = workspace.name;
+
+        editDialog.addEventListener('closed', async (event) => {
+            if (event.detail.action === 'save') {
+                const newName = editInput.value.trim();
+                if (newName && newName !== workspace.name) {
+                    await updateWorkspaceName(workspace.id, newName);
+                }
+            }
+            // No need to reset input here, it's reset when the dialog is next opened.
+        }, { once: true }); // Use once to avoid multiple listeners
+
+        editDialog.show();
+    }
+
+    async function updateWorkspaceName(workspaceId, newName) {
+        const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
+        const workspaceToUpdate = workspaces.find(w => w.id === workspaceId);
+        if (workspaceToUpdate) {
+            workspaceToUpdate.name = newName;
+            await chrome.storage.local.set({ workspaces });
+            showSnackbar(`Workspace renamed to "${newName}".`);
+            renderWorkspaces();
         }
     }
 
