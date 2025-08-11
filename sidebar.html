@@ -18,14 +18,6 @@
       }
     }
     </script>
-    <script type="module">
-        import '@material/web/all.js';
-        import {
-            styles as typescaleStyles
-        } from '@material/web/typography/md-typescale-styles.js';
-
-        document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
-    </script>
 </head>
 <body class="dark">
     <div class="nav-drawer">
@@ -72,6 +64,32 @@
             <md-outlined-button form="create-workspace-form" value="cancel">Cancel</md-outlined-button>
             <md-filled-button form="create-workspace-form" value="create">Create</md-filled-button>
         </div>
+    </md-dialog>
+
+    <md-dialog id="edit-workspace-dialog">
+        <div slot="headline">Edit Workspace Name</div>
+        <form id="edit-workspace-form" slot="content" method="dialog">
+            <md-filled-text-field label="Workspace name" required id="edit-workspace-name-input"></md-filled-text-field>
+        </form>
+        <div slot="actions">
+            <md-text-button form="edit-workspace-form" value="cancel">Cancel</md-text-button>
+            <md-filled-button form="edit-workspace-form" value="save">Save</md-filled-button>
+        </div>
+    </md-dialog>
+
+    <md-dialog id="delete-confirm-dialog">
+        <div slot="headline">Confirm Deletion</div>
+        <div slot="content">
+            Are you sure you want to delete this workspace? Its tabs will be ungrouped.
+        </div>
+        <div slot="actions">
+            <md-text-button id="delete-cancel-btn">Cancel</md-text-button>
+            <md-filled-button id="delete-confirm-btn">Delete</md-filled-button>
+        </div>
+    </md-dialog>
+
+    <md-dialog id="snackbar-dialog">
+        <div slot="content" id="snackbar-message" class="snackbar-message"></div>
     </md-dialog>
 
     <script src="sidebar.js"></script>
