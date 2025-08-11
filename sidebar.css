@@ -74,8 +74,23 @@ body.dark {
     padding: 8px;
 }
 
+.workspace-list {
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+
 md-list-item {
     cursor: pointer;
+}
+
+.tab-list md-list-item:hover {
+    background-color: var(--md-sys-color-surface-container-high);
+}
+
+.workspace-list md-list-item.active {
+    background-color: var(--md-sys-color-secondary-container);
+    border-radius: 24px;
 }
 
 md-list-item .favicon {
@@ -84,21 +99,14 @@ md-list-item .favicon {
     margin-right: 16px; /* Add some spacing */
 }
 
-.nav-drawer-footer {
-    padding: 16px;
-    border-top: 1px solid var(--md-sys-color-outline-variant);
-    flex-shrink: 0;
-    display: flex; /* Use flexbox for centering */
-    justify-content: center; /* Center button horizontally */
-}
-
 #add-tab-btn {
     width: 100%;
+    margin-bottom: 16px;
 }
 
 md-fab {
     position: absolute;
-    bottom: 104px; /* Adjusted to give more space from the footer */
+    bottom: 24px;
     right: 24px;
 }
 

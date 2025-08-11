@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const createWorkspaceDialog = document.getElementById('create-workspace-dialog');
         const workspaceNameInput = document.getElementById('workspace-name-input');
         const addTabBtn = document.getElementById('add-tab-btn');
-        const workspaceTabs = document.querySelector('.workspace-tabs');
+        const workspaceList = document.querySelector('.workspace-list');
         const tabList = document.querySelector('.tab-list');
 
         const ACTIVE_WORKSPACE_ID_KEY = 'activeWorkspaceId';
@@ -14,23 +14,28 @@ document.addEventListener('DOMContentLoaded', function() {
             const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
             const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
 
-            workspaceTabs.innerHTML = ''; // Clear existing workspaces
+            workspaceList.innerHTML = ''; // Clear existing workspaces
             if (workspaces.length === 0) {
-                // Handle empty state if necessary, maybe a placeholder in the tabs area
+                // Handle empty state if necessary, maybe a placeholder in the list
+                const placeholder = document.createElement('md-list-item');
+                placeholder.headline = "Create a workspace to begin";
+                placeholder.disabled = true;
+                workspaceList.appendChild(placeholder);
+            } else {
+                workspaces.forEach(workspace => {
+                    const item = document.createElement('md-list-item');
+                    item.dataset.workspaceId = workspace.id;
+                    item.headline = workspace.name;
+                    item.innerHTML = `
+                        <md-icon slot="start">space_dashboard</md-icon>
+                        ${workspace.name}
+                    `;
+                    if (workspace.id === activeWorkspaceId) {
+                        item.classList.add('active');
+                    }
+                    workspaceList.appendChild(item);
+                });
             }
-
-            workspaces.forEach(workspace => {
-                const tab = document.createElement('md-primary-tab');
-                tab.dataset.workspaceId = workspace.id;
-                tab.innerHTML = `
-                    <div slot="icon"></div>
-                    ${workspace.name}
-                `;
-                if (workspace.id === activeWorkspaceId) {
-                    tab.active = true;
-                }
-                workspaceTabs.appendChild(tab);
-            });
 
             renderTabsForActiveWorkspace();
         }
@@ -67,6 +72,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         item.appendChild(favicon);
                     }
 
+                    const closeButton = document.createElement('md-icon-button');
+                    closeButton.slot = 'end';
+                    closeButton.innerHTML = '<md-icon>close</md-icon>';
+                    closeButton.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent the list item's click event
+                        removeTabFromWorkspace(tab.id);
+                    });
+                    item.appendChild(closeButton);
+
                     item.addEventListener('click', () => {
                         chrome.tabs.update(tab.id, { active: true });
                         chrome.windows.update(tab.windowId, { focused: true });
@@ -102,6 +116,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        async function removeTabFromWorkspace(tabId) {
+            const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
+            const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
+            const activeWorkspace = workspaces.find(w => w.id === activeWorkspaceId);
+
+            if (activeWorkspace && activeWorkspace.tabs) {
+                activeWorkspace.tabs = activeWorkspace.tabs.filter(id => id !== tabId);
+                await chrome.storage.local.set({ workspaces });
+                await renderTabsForActiveWorkspace(); // Re-render the list
+            }
+        }
+
         async function renderTabsForActiveWorkspace() {
             const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
             const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
@@ -109,11 +135,13 @@ document.addEventListener('DOMContentLoaded', function() {
             renderTabs(activeWorkspace ? activeWorkspace.tabs : []);
         }
 
-        function handleWorkspaceTabChange(event) {
-            const selectedTab = event.target.activeTab;
-            if (selectedTab) {
-                const workspaceId = selectedTab.dataset.workspaceId;
-                activateWorkspace(workspaceId);
+        function handleWorkspaceListClick(event) {
+            const listItem = event.target.closest('md-list-item');
+            if (listItem && !listItem.disabled) {
+                const workspaceId = listItem.dataset.workspaceId;
+                if (workspaceId) {
+                    activateWorkspace(workspaceId);
+                }
             }
         }
 
@@ -180,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
         createWorkspaceBtn.addEventListener('click', () => createWorkspaceDialog.show());
         createWorkspaceDialog.addEventListener('closed', handleCreateWorkspaceDialogClose);
         addTabBtn.addEventListener('click', addCurrentTabToActiveWorkspace);
-        workspaceTabs.addEventListener('change', handleWorkspaceTabChange);
+        workspaceList.addEventListener('click', handleWorkspaceListClick);
 
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.action === 'refresh') {
