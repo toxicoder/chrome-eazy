@@ -1,7 +1,7 @@
-import '@material/web/all.js';
+import 'https://esm.run/@material/web/all.js';
 import {
     styles as typescaleStyles
-} from '@material/web/typography/md-typescale-styles.js';
+} from 'https://esm.run/@material/web/typography/md-typescale-styles.js';
 
 document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
 
@@ -12,22 +12,19 @@ function main() {
     const workspaceNameInput = document.getElementById('workspace-name-input');
     const addTabBtn = document.getElementById('add-tab-btn');
     const workspaceList = document.querySelector('.workspace-list');
-    const tabList = document.querySelector('.tab-list');
-    const tabs = document.querySelector('md-tabs');
-
     const ACTIVE_WORKSPACE_ID_KEY = 'activeWorkspaceId';
+    let expandedWorkspaceId = null;
 
     function showSnackbar(message) {
-        const snackbar = document.getElementById('snackbar-dialog');
-        const messageElement = document.getElementById('snackbar-message');
-        if (!snackbar || !messageElement) return;
+        const snackbar = document.getElementById('snackbar');
+        if (!snackbar) return;
 
-        messageElement.textContent = message;
-        snackbar.show();
+        snackbar.textContent = message;
+        snackbar.classList.add('show');
 
-        // Automatically close after 3 seconds
+        // Automatically hide after 3 seconds
         setTimeout(() => {
-            snackbar.close();
+            snackbar.classList.remove('show');
         }, 3000);
     }
 
@@ -35,28 +32,39 @@ function main() {
         const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
         const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
 
+        addTabBtn.disabled = !activeWorkspaceId;
+
         workspaceList.innerHTML = ''; // Clear existing workspaces
         if (workspaces.length === 0) {
-            // Handle empty state if necessary, maybe a placeholder in the list
             const placeholder = document.createElement('md-list-item');
             placeholder.headline = "Create a workspace to begin";
             placeholder.disabled = true;
             workspaceList.appendChild(placeholder);
         } else {
-            workspaces.forEach(workspace => {
+            for (const workspace of workspaces) {
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = 'workspace-item-wrapper';
+
                 const item = document.createElement('md-list-item');
-                    item.type = 'button';
+                item.type = 'button';
                 item.dataset.workspaceId = workspace.id;
                 item.headline = workspace.name;
 
-                    const icon = document.createElement('md-icon');
-                    icon.slot = 'start';
-                    icon.innerHTML = 'space_dashboard';
-                    item.appendChild(icon);
+                const startIcon = document.createElement('md-icon');
+                startIcon.slot = 'start';
+                startIcon.innerHTML = 'space_dashboard';
+                item.appendChild(startIcon);
 
                 if (workspace.id === activeWorkspaceId) {
                     item.classList.add('active');
                 }
+
+                // Add chevron for expand/collapse
+                const chevron = document.createElement('md-icon');
+                chevron.slot = 'end';
+                chevron.innerHTML = 'expand_more';
+                chevron.className = 'expand-icon';
+                item.appendChild(chevron);
 
                 const editButton = document.createElement('md-icon-button');
                 editButton.innerHTML = '<md-icon>edit</md-icon>';
@@ -78,62 +86,81 @@ function main() {
 
                 item.appendChild(editButton);
                 item.appendChild(deleteButton);
-                workspaceList.appendChild(item);
-            });
-        }
+                itemWrapper.appendChild(item);
 
-        renderTabsForActiveWorkspace();
+                // Create container for tabs
+                const tabsContainer = document.createElement('div');
+                tabsContainer.className = 'tabs-container';
+                const tabList = document.createElement('md-list');
+                tabsContainer.appendChild(tabList);
+                itemWrapper.appendChild(tabsContainer);
+                workspaceList.appendChild(itemWrapper);
+
+                // Render tabs and manage visibility
+                if (workspace.id === expandedWorkspaceId) {
+                    await renderTabs(workspace.tabs, tabList);
+                    tabsContainer.style.maxHeight = '500px'; // Animate open
+                    chevron.classList.add('expanded');
+                } else {
+                    tabsContainer.style.maxHeight = '0'; // Animate closed
+                }
+            }
+        }
     }
 
-    async function renderTabs(tabIds) {
-        tabList.innerHTML = ''; // Clear existing tabs
+    async function renderTabs(tabIds, container) {
+        container.innerHTML = ''; // Clear existing tabs
 
         if (!tabIds || tabIds.length === 0) {
             const placeholder = document.createElement('md-list-item');
-            placeholder.headline = "No tabs in this workspace yet.";
+            placeholder.headline = "No tabs in this workspace.";
             placeholder.disabled = true;
-            tabList.appendChild(placeholder);
+            container.appendChild(placeholder);
             return;
         }
 
         try {
             const validTabIds = tabIds.filter(id => typeof id === 'number');
             if (validTabIds.length === 0) {
-                return renderTabs([]); // Recurse with empty to show placeholder
+                // Call with empty array to show the placeholder
+                return renderTabs([], container);
             }
 
             const tabsInfo = await chrome.tabs.get(validTabIds);
             tabsInfo.forEach(tab => {
                 const item = document.createElement('md-list-item');
-                    item.type = 'button';
+                item.type = 'button';
                 item.headline = tab.title;
                 item.supportingText = new URL(tab.url).hostname;
                 item.dataset.tabId = tab.id;
+                item.classList.add('tab-item'); // Add class for styling
 
                 if (tab.favIconUrl) {
-                        const icon = document.createElement('md-icon');
-                        icon.slot = 'start';
                     const favicon = document.createElement('img');
                     favicon.src = tab.favIconUrl;
                     favicon.className = 'favicon';
-                        icon.appendChild(favicon);
-                        item.appendChild(icon);
+                    favicon.slot = 'start';
+                    item.appendChild(favicon);
                 }
 
                 const closeButton = document.createElement('md-icon-button');
                 closeButton.slot = 'end';
                 closeButton.innerHTML = '<md-icon>close</md-icon>';
                 closeButton.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent the list item's click event
+                    e.stopPropagation();
                     removeTabFromWorkspace(tab.id);
                 });
                 item.appendChild(closeButton);
 
                 item.addEventListener('click', () => {
-                    chrome.tabs.update(tab.id, { active: true });
-                    chrome.windows.update(tab.windowId, { focused: true });
+                    chrome.tabs.update(tab.id, {
+                        active: true
+                    });
+                    chrome.windows.update(tab.windowId, {
+                        focused: true
+                    });
                 });
-                tabList.appendChild(item);
+                container.appendChild(item);
             });
         } catch (error) {
             console.error("Error rendering tabs:", error);
@@ -141,7 +168,7 @@ function main() {
             errorItem.headline = "Could not load tabs.";
             errorItem.supportingText = "They may have been closed.";
             errorItem.disabled = true;
-            tabList.appendChild(errorItem);
+            container.appendChild(errorItem);
             // Attempt to clean up stale tabs from storage
             await removeInvalidTabsFromWorkspace();
         }
@@ -172,15 +199,8 @@ function main() {
         if (activeWorkspace && activeWorkspace.tabs) {
             activeWorkspace.tabs = activeWorkspace.tabs.filter(id => id !== tabId);
             await chrome.storage.local.set({ workspaces });
-            await renderTabsForActiveWorkspace(); // Re-render the list
+            await renderWorkspaces(); // Re-render the entire list
         }
-    }
-
-    async function renderTabsForActiveWorkspace() {
-        const { workspaces = [] } = await chrome.storage.local.get({ workspaces: [] });
-        const { [ACTIVE_WORKSPACE_ID_KEY]: activeWorkspaceId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
-        const activeWorkspace = workspaces.find(w => w.id === activeWorkspaceId);
-        renderTabs(activeWorkspace ? activeWorkspace.tabs : []);
     }
 
     function handleWorkspaceListClick(event) {
@@ -188,18 +208,29 @@ function main() {
         if (listItem && !listItem.disabled) {
             const workspaceId = listItem.dataset.workspaceId;
             if (workspaceId) {
+                // If the clicked workspace is already expanded, collapse it
+                if (expandedWorkspaceId === workspaceId) {
+                    expandedWorkspaceId = null;
+                } else {
+                    expandedWorkspaceId = workspaceId;
+                }
+                // Activate the workspace and re-render to show expand/collapse
                 activateWorkspace(workspaceId);
             }
         }
     }
 
     async function activateWorkspace(workspaceId) {
-        await chrome.storage.local.set({ [ACTIVE_WORKSPACE_ID_KEY]: workspaceId });
-        // The message passing logic to show/hide tabs can be complex and depends
-        // on the background script. For now, we'll just re-render the UI.
-        // A more robust solution would involve messaging the background script
-        // to handle tab visibility based on the active workspace.
-        chrome.runtime.sendMessage({ action: 'workspaceActivated', workspaceId });
+        const { [ACTIVE_WORKSPACE_ID_KEY]: currentActiveId } = await chrome.storage.local.get(ACTIVE_WORKSPACE_ID_KEY);
+
+        // Only send a message if the active workspace is actually changing
+        if (currentActiveId !== workspaceId) {
+            await chrome.storage.local.set({ [ACTIVE_WORKSPACE_ID_KEY]: workspaceId });
+            chrome.runtime.sendMessage({ action: 'workspaceActivated', workspaceId });
+        } else {
+            // If the same workspace is clicked, we just need to re-render for expand/collapse
+            await renderWorkspaces();
+        }
     }
 
     async function addCurrentTabToActiveWorkspace() {
@@ -224,7 +255,7 @@ function main() {
                 activeWorkspace.tabs.push(currentTab.id);
                 await chrome.storage.local.set({ workspaces });
                 showSnackbar(`Tab added to "${activeWorkspace.name}".`);
-                renderTabsForActiveWorkspace();
+                renderWorkspaces();
             } else {
                 showSnackbar('This tab is already in the active workspace.');
             }
@@ -351,16 +382,6 @@ function main() {
     createWorkspaceDialog.addEventListener('closed', handleCreateWorkspaceDialogClose);
     addTabBtn.addEventListener('click', addCurrentTabToActiveWorkspace);
     workspaceList.addEventListener('click', handleWorkspaceListClick);
-    tabs.addEventListener('change', () => {
-        const selectedTab = tabs.selected;
-        if (selectedTab === 0) { // Workspaces
-            workspaceList.style.display = 'block';
-            tabList.style.display = 'none';
-        } else { // Tabs
-            workspaceList.style.display = 'none';
-            tabList.style.display = 'block';
-        }
-    });
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (request.action === 'refresh') {
