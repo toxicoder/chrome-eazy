@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const addTabBtn = document.getElementById('add-tab-btn');
         const workspaceList = document.querySelector('.workspace-list');
         const tabList = document.querySelector('.tab-list');
+        const tabs = document.querySelector('md-tabs');
 
         const ACTIVE_WORKSPACE_ID_KEY = 'activeWorkspaceId';
 
@@ -209,6 +210,16 @@ document.addEventListener('DOMContentLoaded', function() {
         createWorkspaceDialog.addEventListener('closed', handleCreateWorkspaceDialogClose);
         addTabBtn.addEventListener('click', addCurrentTabToActiveWorkspace);
         workspaceList.addEventListener('click', handleWorkspaceListClick);
+        tabs.addEventListener('change', () => {
+            const selectedTab = tabs.selected;
+            if (selectedTab === 0) { // Workspaces
+                workspaceList.style.display = 'block';
+                tabList.style.display = 'none';
+            } else { // Tabs
+                workspaceList.style.display = 'none';
+                tabList.style.display = 'block';
+            }
+        });
 
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.action === 'refresh') {
