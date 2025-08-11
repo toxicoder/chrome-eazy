@@ -44,7 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `;
-            // In a real scenario, this would open the workspace. For now, it does nothing.
+            card.addEventListener('click', () => {
+                chrome.runtime.sendMessage({ action: 'workspaceActivated', workspaceId: workspace.id });
+                chrome.sidePanel.open({ windowId: undefined });
+            });
             grid.appendChild(card);
         });
     }

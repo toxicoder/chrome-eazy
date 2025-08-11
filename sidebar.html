@@ -11,15 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Material Symbols -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <script type="importmap">
-    {
-      "imports": {
-        "@material/web/": "https://esm.run/@material/web/"
-      }
-    }
-    </script>
 </head>
-<body class="dark">
+<body>
     <div class="nav-drawer">
         <div class="nav-drawer-header">
             <h1 class="nav-drawer-title">Chrome Eazy</h1>
@@ -31,17 +24,8 @@
                 <md-icon slot="icon">add</md-icon>
             </md-filled-button>
 
-            <md-tabs>
-                <md-primary-tab>Workspaces</md-primary-tab>
-                <md-primary-tab>Tabs</md-primary-tab>
-            </md-tabs>
-
             <md-list class="workspace-list">
-                <!-- Workspaces will be rendered here -->
-            </md-list>
-
-            <md-list class="tab-list" style="display: none;">
-                <!-- Tabs will be rendered here -->
+                <!-- Workspaces and their tabs will be rendered here -->
             </md-list>
         </div>
     </div>
@@ -88,10 +72,8 @@
         </div>
     </md-dialog>
 
-    <md-dialog id="snackbar-dialog">
-        <div slot="content" id="snackbar-message" class="snackbar-message"></div>
-    </md-dialog>
+    <div id="snackbar" class="snackbar"></div>
 
-    <script src="sidebar.js"></script>
+    <script type="module" src="sidebar.js"></script>
 </body>
 </html>
