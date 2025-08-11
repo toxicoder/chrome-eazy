@@ -9,7 +9,9 @@
     "tabs",
     "storage"
   ],
-  "action": {},
+  "action": {
+    "default_title": "Open Workspaces"
+  },
   "background": {
     "service_worker": "background.js"
   },
