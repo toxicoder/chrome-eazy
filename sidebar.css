@@ -1,212 +1,47 @@
+/* At the top of sidebar.css */
 :root {
-    color-scheme: light dark;
-    --md-sys-color-primary: #6750A4;
-    --md-sys-color-on-primary: #FFFFFF;
-    --md-sys-color-primary-container: #EADDFF;
-    --md-sys-color-on-primary-container: #21005E;
-    --md-sys-color-secondary: #625B71;
-    --md-sys-color-on-secondary: #FFFFFF;
-    --md-sys-color-secondary-container: #E8DEF8;
-    --md-sys-color-on-secondary-container: #1E192B;
-    --md-sys-color-tertiary: #7D5260;
-    --md-sys-color-on-tertiary: #FFFFFF;
-    --md-sys-color-tertiary-container: #FFD8E4;
-    --md-sys-color-on-tertiary-container: #31111D;
-    --md-sys-color-error: #B3261E;
-    --md-sys-color-on-error: #FFFFFF;
-    --md-sys-color-error-container: #F9DEDC;
-    --md-sys-color-on-error-container: #410E0B;
-    --md-sys-color-background: #FFFBFE;
-    --md-sys-color-on-background: #1C1B1F;
-    --md-sys-color-surface: #FFFBFE;
-    --md-sys-color-on-surface: #1C1B1F;
-    --md-sys-color-surface-variant: #E7E0EC;
-    --md-sys-color-on-surface-variant: #49454F;
-    --md-sys-color-outline: #79747E;
-    --md-sys-color-outline-variant: #C4C7C5;
-    --md-sys-color-shadow: #000000;
-    --md-sys-color-scrim: #000000;
-    --md-sys-color-inverse-surface: #313033;
-    --md-sys-color-inverse-on-surface: #F4EFF4;
-    --md-sys-color-inverse-primary: #D0BCFF;
-    --md-sys-color-surface-dim: #DED8E1;
-    --md-sys-color-surface-bright: #FEF7FF;
-    --md-sys-color-surface-container-lowest: #FFFFFF;
-    --md-sys-color-surface-container-low: #F7F2FA;
-    --md-sys-color-surface-container: #F3EDF7;
-    --md-sys-color-surface-container-high: #ECE6F0;
-    --md-sys-color-surface-container-highest: #E6E0E9;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --md-sys-color-primary: #D0BCFF;
-        --md-sys-color-on-primary: #381E72;
-        --md-sys-color-primary-container: #4F378B;
-        --md-sys-color-on-primary-container: #EADDFF;
-        --md-sys-color-secondary: #CCC2DC;
-        --md-sys-color-on-secondary: #332D41;
-        --md-sys-color-secondary-container: #4A4458;
-        --md-sys-color-on-secondary-container: #E8DEF8;
-        --md-sys-color-tertiary: #EFB8C8;
-        --md-sys-color-on-tertiary: #492532;
-        --md-sys-color-tertiary-container: #633B48;
-        --md-sys-color-on-tertiary-container: #FFD8E4;
-        --md-sys-color-error: #F2B8B5;
-        --md-sys-color-on-error: #601410;
-        --md-sys-color-error-container: #8C1D18;
-        --md-sys-color-on-error-container: #F9DEDC;
-        --md-sys-color-background: #1C1B1F;
-        --md-sys-color-on-background: #E6E1E5;
-        --md-sys-color-surface: #1C1B1F;
-        --md-sys-color-on-surface: #E6E1E5;
-        --md-sys-color-surface-variant: #49454F;
-        --md-sys-color-on-surface-variant: #CAC4D0;
-        --md-sys-color-outline: #938F99;
-        --md-sys-color-outline-variant: #49454F;
-        --md-sys-color-shadow: #000000;
-        --md-sys-color-scrim: #000000;
-        --md-sys-color-inverse-surface: #E6E1E5;
-        --md-sys-color-inverse-on-surface: #313033;
-        --md-sys-color-inverse-primary: #6750A4;
-        --md-sys-color-surface-dim: #141218;
-        --md-sys-color-surface-bright: #3B383E;
-        --md-sys-color-surface-container-lowest: #0F0D13;
-        --md-sys-color-surface-container-low: #1D1B20;
-        --md-sys-color-surface-container: #211F26;
-        --md-sys-color-surface-container-high: #2B2931;
-        --md-sys-color-surface-container-highest: #36343B;
-    }
+    /* These are automatically provided by Material Web Components,
+       but you can override them here if needed. */
+    --md-list-item-label-text-color: var(--md-sys-color-on-surface);
 }
 
 body {
+    background-color: var(--md-sys-color-surface-container);
+    color: var(--md-sys-color-on-surface);
     font-family: 'Roboto', sans-serif;
     margin: 0;
-    width: 320px; /* A bit wider for better spacing */
-    background-color: var(--md-sys-color-background);
-    color: var(--md-sys-color-on-background);
-    overflow: hidden; /* Prevent body scrollbars */
 }
 
-.nav-drawer {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background-color: var(--md-sys-color-surface-container-low);
+.sidebar-container {
+    padding: 16px;
 }
 
-.nav-drawer-header {
-    padding: 24px 16px 16px;
-    border-bottom: 1px solid var(--md-sys-color-outline-variant);
-    flex-shrink: 0;
-}
-
-.nav-drawer-title {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: var(--md-sys-color-on-surface);
-}
-
-.nav-drawer-content {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 8px;
-}
-
-.workspace-list {
-    border-bottom: 1px solid var(--md-sys-color-outline-variant);
-    padding-bottom: 8px;
-    margin-bottom: 8px;
-}
-
-md-list-item {
-    cursor: pointer;
-}
-
-.workspace-list .workspace-item-wrapper {
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.workspace-list md-list-item {
-    --md-list-item-container-color: transparent;
-}
-
-.workspace-list md-list-item.active {
-    background-color: var(--md-sys-color-secondary-container);
-    border-radius: 24px 24px 0 0;
-}
-
-.expand-icon {
-    transition: transform 0.3s ease;
-}
-
-.expand-icon.expanded {
-    transform: rotate(180deg);
-}
-
-.tabs-container {
-    background-color: var(--md-sys-color-surface-container);
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-}
-
-.tab-item {
-    --md-list-item-label-text-font: var(--md-sys-typescale-label-large-font);
-    padding-left: 24px; /* Indent tab items */
-}
-
-.tab-item:hover {
-    background-color: var(--md-sys-color-surface-container-high);
-}
-
-.tab-list md-list-item:hover {
-    background-color: var(--md-sys-color-surface-container-high);
-}
-
-md-list-item .favicon {
-    width: 24px;
-    height: 24px;
-    margin-right: 16px; /* Add some spacing */
-}
-
-#add-tab-btn {
-    width: 100%;
+.sidebar-header {
     margin-bottom: 16px;
+}
+
+.sidebar-title {
+    font: var(--md-sys-typescale-headline-small-font);
+    color: var(--md-sys-color-primary);
+    margin: 0;
+}
+
+md-list-item.active {
+    background-color: var(--md-sys-color-secondary-container);
+    border-radius: 24px;
 }
 
 md-fab {
     position: absolute;
-    bottom: 24px;
-    right: 24px;
+    bottom: 16px;
+    right: 16px;
 }
 
+/* Ensure menus and dialogs use M3 tokens */
 md-dialog {
     --md-dialog-container-color: var(--md-sys-color-surface-container-high);
 }
 
-md-filled-text-field {
-    width: 100%;
-}
-
-.snackbar {
-    position: fixed;
-    bottom: -100px; /* Start off-screen */
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--md-sys-color-inverse-surface);
-    color: var(--md-sys-color-inverse-on-surface);
-    padding: 14px 16px;
-    border-radius: 4px;
-    box-shadow: var(--md-sys-color-shadow) 0px 1px 3px;
-    transition: bottom 0.3s ease-in-out;
-    z-index: 10;
-    font-family: var(--md-sys-typescale-body-medium-font-family);
-    font-size: var(--md-sys-typescale-body-medium-font-size);
-}
-
-.snackbar.show {
-    bottom: 24px;
+md-menu {
+    --md-menu-container-color: var(--md-sys-color-surface-container);
 }
