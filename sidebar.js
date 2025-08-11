@@ -1,7 +1,14 @@
-// At the top of your sidebar.js
-import 'https://esm.run/@material/web/all.js';
-import { styles as typescaleStyles } from 'https://esm.run/@material/web/typography/md-typescale-styles.js';
-document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+import '@material/web/list/list.js';
+import '@material/web/list/list-item.js';
+import '@material/web/icon/icon.js';
+import '@material/web/iconbutton/icon-button.js';
+import '@material/web/fab/fab.js';
+import '@material/web/dialog/dialog.js';
+import '@material/web/button/outlined-button.js';
+import '@material/web/button/filled-button.js';
+import '@material/web/textfield/filled-text-field.js';
+import '@material/web/menu/menu.js';
+import '@material/web/menu/menu-item.js';
 
 // --- Inside your main function ---
 const workspaceList = document.querySelector('.workspace-list');

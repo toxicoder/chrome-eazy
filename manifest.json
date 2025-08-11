@@ -16,7 +16,10 @@
     "service_worker": "background.js"
   },
   "side_panel": {
-    "default_path": "sidebar.html"
+    "default_path": "dist/sidebar.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
   },
   "chrome_url_overrides": {
     "newtab": "dashboard.html"
